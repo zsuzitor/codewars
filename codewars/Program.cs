@@ -214,6 +214,7 @@ namespace codewars
         public enum FigureType { Pawn, King, Queen, Rook, Knight, Bishop }
 
         //struct to make it convenient to work with cells
+        //изменять нельзя
         public struct Pos
         {
             public readonly sbyte X;
@@ -233,7 +234,7 @@ namespace codewars
             //public override bool Equals(object obj);
             //public override int GetHashCode();
         }
-
+        //изменять нельзя
         public class Figure
         {
             public FigureType Type { get; }
@@ -536,8 +537,58 @@ namespace codewars
                     {
                         killerForKiller.Add(pieces.Where(x1 => Figurest.CanKill(x1, i.Cell, (byte)player, pieces)).ToList());
                     }
+
                     //TODO надо определить можно ли убить всех , тк 1 фигура может убивать несколько=> убив 1 она уже не убьет другую
-                    //если убили королем то надо снова проверить его позицию
+                    
+
+                    for(int i=0;i< piecesMated.Count; ++i)
+                    {
+                        foreach(var i2 in killerForKiller[i])
+                        {
+                            var roll = i2.Cell;
+                            i2.Cell = piecesMated[i].Cell;
+                            List<Figure> tmppieces = new List<Figure>();
+                            tmppieces.AddRange(pieces);
+                            tmppieces.Remove(piecesMated[i]);
+                            int newpl = player == 0 ? 1 : 0;
+                            var newboard = tmppieces.Where(x1 => Figurest.CanKill(x1, king.Cell, (byte)newpl , tmppieces)).Count();
+                            i2.Cell = roll;
+                            if (newboard == 0)
+                                return false;
+                        }
+
+
+                    }
+
+
+
+
+
+                    //bool notKilledKiller = false;
+                    //for (int i=0;i<killerForKiller.Count;++i)
+                    //    if (killerForKiller[i].Count == 0)
+                    //    {
+                    //        notKilledKiller = true;
+                    //        break;
+                    //    }
+                    //    else
+                    //    {
+                    //        //если убили королем то надо снова проверить его позицию
+                    //        foreach (var i2 in killerForKiller[i])
+                    //        {
+                    //            if (i2.Type == FigureType.King)
+                    //            {
+                    //                //bool newCellKing = Figurest.CanKill(x1, i, (byte)player, pieces);
+                    //                if (pieces.Where(x1 => Figurest.CanKill(x1, piecesMated[i].Cell, (byte)player, pieces)).Count() == 0)
+                    //                    return false;
+                    //            }
+                    //        }
+                    //    }
+
+                    //if (notKilledKiller)
+                    //    return true;
+                           
+                    
                 }
 
                 //попробовать закрыть(преградить путь)  атакующей фигуре
