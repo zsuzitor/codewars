@@ -1,0 +1,1 @@
+E:\csharp\codewars\codewars\bin\Debug\codewars.exe.config
