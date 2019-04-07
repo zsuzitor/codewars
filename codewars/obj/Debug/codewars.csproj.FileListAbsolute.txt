@@ -1,1 +1,6 @@
 E:\csharp\codewars\codewars\bin\Debug\codewars.exe.config
+E:\csharp\codewars\codewars\bin\Debug\codewars.exe
+E:\csharp\codewars\codewars\bin\Debug\codewars.pdb
+E:\csharp\codewars\codewars\obj\Debug\codewars.csprojResolveAssemblyReference.cache
+E:\csharp\codewars\codewars\obj\Debug\codewars.exe
+E:\csharp\codewars\codewars\obj\Debug\codewars.pdb

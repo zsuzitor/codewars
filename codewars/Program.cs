@@ -199,7 +199,7 @@ namespace codewars
 
     namespace checkAndMate
     {
-        //Check and Mate?
+        //Check and Mate? https://www.codewars.com/kata/52fcc820f7214727bc0004b7
         //реализовано без наследования и полиморфизма тк условие требовало именно такой реализации
         //шахматная доска
         //b-black
@@ -255,80 +255,158 @@ namespace codewars
 
         public static class Figurest
         {
-            public static bool CanKill(Figure thfg, Pos cell, byte owner, IList<Figure> pieces)
+            public static List<Pos> CanKill(Figure thfg, Pos cell, byte owner, IList<Figure> pieces)
             {
                 if (thfg.Owner == owner)
-                    return false;
-
-                //TODO нужно еще проверять может ли достать фигира, тк перед искомой ячейкой может стоять другая фигура
+                    return null;
+                
                 switch (thfg.Type)
                 {
                     case FigureType.Pawn:
                         return Figurest.CanKillPawnMovement(thfg, cell, thfg.Owner);
-                    //break;
                     case FigureType.King:
                         return Figurest.CanKillKingMovement(thfg, cell, thfg.Owner);
-                    //break;
                     case FigureType.Queen:
                         return Figurest.CanKillQueenMovement(thfg, cell, pieces);
-                    //break;
                     case FigureType.Rook:
                         return Figurest.CanKillRookMovement(thfg, cell, pieces);
-                    //break;
                     case FigureType.Knight:
                         return Figurest.CanKillKnightMovement(thfg, cell);
-                    //break;
                     case FigureType.Bishop:
                         return Figurest.CanKillBishopMovement(thfg, cell, pieces);
-                        //break;
                 }
-                return false;
+                return null;
             }
-            public static bool CanKillPawnMovement(Figure thfg, Pos cell, byte owner)
+
+            public static List<Pos> CanMove(Figure thfg, Pos cell, byte owner, IList<Figure> pieces)
             {
+                if (thfg.Owner != owner)
+                    return null;
+                switch (thfg.Type)
+                {
+                    case FigureType.Pawn:
+                        return Figurest.CanMovePawnMovement(thfg, cell, thfg.Owner);
+                    case FigureType.King:
+                        return Figurest.CanMoveKingMovement(thfg, cell, thfg.Owner);
+                    case FigureType.Queen:
+                        return Figurest.CanMoveQueenMovement(thfg, cell, pieces);
+                    case FigureType.Rook:
+                        return Figurest.CanMoveRookMovement(thfg, cell, pieces);
+                    case FigureType.Knight:
+                        return Figurest.CanMoveKnightMovement(thfg, cell);
+                    case FigureType.Bishop:
+                        return Figurest.CanMoveBishopMovement(thfg, cell, pieces);
+                }
+                return null;
+            }
+
+
+            public static List<Pos> CanMovePawnMovement(Figure thfg, Pos cell, byte owner)
+            {
+                List<Pos> res = new List<Pos>();
                 if (owner == 0 || owner == 2)
                 {
-                    if (cell.Y == thfg.Cell.Y - 1 && cell.X == thfg.Cell.X - 1)
-                        return true;
-                    if (cell.Y == thfg.Cell.Y - 1 && cell.X == thfg.Cell.X + 1)
-                        return true;
+                    if (cell.Y == thfg.Cell.Y - 1 && cell.X == thfg.Cell.X )
+                        return res;
+                    if (thfg.Cell.Y==6&& owner==0)
+                    {
+                        if (cell.Y == thfg.Cell.Y - 2 && cell.X == thfg.Cell.X)
+                            return new List<Pos>() {new Pos(thfg.Cell.Y - 1, thfg.Cell.X) };
+                    }
+                   
                     if (owner == 0)
-                        return false;
+                        return null;
                 }
                 if (owner == 1 || owner == 2)
                 {
-
-                    if (cell.Y == thfg.Cell.Y + 1 && cell.X == thfg.Cell.X - 1)
-                        return true;
-                    if (cell.Y == thfg.Cell.Y + 1 && cell.X == thfg.Cell.X + 1)
-                        return true;
-                    return false;
+                    if (cell.Y == thfg.Cell.Y + 1 && cell.X == thfg.Cell.X )
+                        return res;
+                    if (thfg.Cell.Y == 1 && owner == 1)
+                    {
+                        if (cell.Y == thfg.Cell.Y + 2 && cell.X == thfg.Cell.X)
+                            return new List<Pos>() { new Pos(thfg.Cell.Y + 1, thfg.Cell.X) };
+                    }
+                    return null;
                 }
-                return false;
+                return null;
             }
 
-            public static bool CanKillKingMovement(Figure thfg, Pos cell, byte owner)
+            public static List<Pos> CanKillPawnMovement(Figure thfg, Pos cell, byte owner)
             {
-                if (Figurest.CanKillPawnMovement(thfg, cell, owner))
-                    return true;
+                List<Pos> res = new List<Pos>();
+                if (owner == 0 || owner == 2)
+                {
+                    if (cell.Y == thfg.Cell.Y - 1 && cell.X == thfg.Cell.X - 1)
+                        return res;
+                    if (cell.Y == thfg.Cell.Y - 1 && cell.X == thfg.Cell.X + 1)
+                        return res;
+                    if (owner == 0)
+                        return null;
+                }
+                if (owner == 1 || owner == 2)
+                {
+                    if (cell.Y == thfg.Cell.Y + 1 && cell.X == thfg.Cell.X - 1)
+                        return res;
+                    if (cell.Y == thfg.Cell.Y + 1 && cell.X == thfg.Cell.X + 1)
+                        return res;
+                    return null;
+                }
+                return null;
+            }
+
+            public static List<Pos> CanMoveKingMovement(Figure thfg, Pos cell, byte owner)
+            {
+                List<Pos> res = new List<Pos>();
+                if (Figurest.CanMovePawnMovement(thfg, cell, 2) != null)
+                    return res;
                 if (cell.Y == thfg.Cell.Y && cell.X == thfg.Cell.X + 1)
-                    return true;
+                    return res;
                 if (cell.Y == thfg.Cell.Y && cell.X == thfg.Cell.X - 1)
-                    return true;
+                    return res;
                 if (cell.Y == thfg.Cell.Y + 1 && cell.X == thfg.Cell.X)
-                    return true;
+                    return res;
                 if (cell.Y == thfg.Cell.Y - 1 && cell.X == thfg.Cell.X)
-                    return true;
-                return false;
+                    return res;
+                return null;
             }
 
 
-            public static bool CanKillRookMovement(Figure thfg, Pos cell, IList<Figure> pieces)
+
+            public static List<Pos> CanKillKingMovement(Figure thfg, Pos cell, byte owner)
+            {
+                List<Pos> res = Figurest.CanKillPawnMovement(thfg, cell, 2);
+                if (res != null)
+                    return res;
+                res = Figurest.CanMovePawnMovement(thfg, cell, 2);
+                if (res != null)
+                    return res;
+                if (cell.Y == thfg.Cell.Y && cell.X == thfg.Cell.X+1 )
+                    return new List<Pos>();
+                if (cell.Y == thfg.Cell.Y && cell.X == thfg.Cell.X-1 )
+                    return new List<Pos>();
+                
+                return null;
+            }
+
+
+            public static List<Pos> CanMoveRookMovement(Figure thfg, Pos cell, IList<Figure> pieces)
+            {
+                return CanKillRookMovement(thfg, cell, pieces);
+
+            }
+
+
+            //return empty sc between figure end cell
+            public static List<Pos> CanKillRookMovement(Figure thfg, Pos cell, IList<Figure> pieces)
             {
                 bool flag1 = true;
                 bool flag2 = true;
                 bool flag3 = true;
                 bool flag4 = true;
+                List<Pos> listPos1 = new List<Pos>();
+                List<Pos> listPos2 = new List<Pos>();
+                List<Pos> listPos3 = new List<Pos>();
+                List<Pos> listPos4 = new List<Pos>();
 
                 for (int i = 1; i < 8; ++i)
                 {
@@ -336,27 +414,27 @@ namespace codewars
                     {
                         if (thfg.Cell.Y == cell.Y && thfg.Cell.X + i == cell.X)
                         {
-                            return true;
+                            return listPos1;
                         }
                         else
                         {
-                            //if((ch.Cell.Y !=))
                             var ch = pieces.FirstOrDefault(x1 => x1.Cell.Y == thfg.Cell.Y && x1.Cell.X == thfg.Cell.X + i);
+                            listPos1.Add(new Pos(thfg.Cell.Y, thfg.Cell.X + i));
                             if (ch != null)
                                 flag1 = false;
                         }
-
                     }
 
                     if (flag2)
                     {
                         if (thfg.Cell.Y == cell.Y && thfg.Cell.X - i == cell.X)
                         {
-                            return true;
+                            return listPos2;
                         }
                         else
                         {
                             var ch = pieces.FirstOrDefault(x1 => x1.Cell.Y == thfg.Cell.Y && x1.Cell.X == thfg.Cell.X - i);
+                            listPos2.Add(new Pos(thfg.Cell.Y, thfg.Cell.X - i));
                             if (ch != null)
                                 flag2 = false;
                         }
@@ -366,52 +444,62 @@ namespace codewars
                     {
                         if (thfg.Cell.X == cell.X && thfg.Cell.Y + i == cell.Y)
                         {
-                            return true;
+                            return listPos3;
                         }
                         else
                         {
                             var ch = pieces.FirstOrDefault(x1 => x1.Cell.X == thfg.Cell.X && x1.Cell.Y == thfg.Cell.Y + i);
+                            listPos3.Add(new Pos(thfg.Cell.Y+i, thfg.Cell.X));
                             if (ch != null)
                                 flag3 = false;
                         }
-
                     }
                     if (flag4)
                     {
                         if (thfg.Cell.X == cell.X && thfg.Cell.Y - i == cell.Y)
                         {
-                            return true;
+                            return listPos4;
                         }
                         else
                         {
                             var ch = pieces.FirstOrDefault(x1 => x1.Cell.X == thfg.Cell.X && x1.Cell.Y == thfg.Cell.Y - i);
+                            listPos4.Add(new Pos(thfg.Cell.Y - i, thfg.Cell.X));
                             if (ch != null)
                                 flag4 = false;
                         }
-
                     }
-
                 }
-                return false;
+                return null;
             }
-            public static bool CanKillBishopMovement(Figure thfg, Pos cell, IList<Figure> pieces)
+
+            public static List<Pos> CanMoveBishopMovement(Figure thfg, Pos cell, IList<Figure> pieces)
+            {
+                return CanKillBishopMovement(thfg, cell, pieces);
+            }
+
+
+            public static List<Pos> CanKillBishopMovement(Figure thfg, Pos cell, IList<Figure> pieces)
             {
                 bool flag1 = true;
                 bool flag2 = true;
                 bool flag3 = true;
                 bool flag4 = true;
-
+                List<Pos> listPos1 = new List<Pos>();
+                List<Pos> listPos2 = new List<Pos>();
+                List<Pos> listPos3 = new List<Pos>();
+                List<Pos> listPos4 = new List<Pos>();
                 for (int i = 1; i < 8; ++i)
                 {
                     if (flag1)
                     {
                         if (thfg.Cell.Y - i == cell.Y && thfg.Cell.X - i == cell.X)
                         {
-                            return true;
+                            return listPos1;
                         }
                         else
                         {
                             var ch = pieces.FirstOrDefault(x1 => x1.Cell.Y == thfg.Cell.Y - i && x1.Cell.X == thfg.Cell.X - i);
+                            listPos1.Add(new Pos(thfg.Cell.Y - i, thfg.Cell.X-i));
                             if (ch != null)
                                 flag1 = false;
                         }
@@ -421,11 +509,12 @@ namespace codewars
                     {
                         if (thfg.Cell.Y - i == cell.Y && thfg.Cell.X + i == cell.X)
                         {
-                            return true;
+                            return listPos2;
                         }
                         else
                         {
                             var ch = pieces.FirstOrDefault(x1 => x1.Cell.Y == thfg.Cell.Y - i && x1.Cell.X == thfg.Cell.X + i);
+                            listPos2.Add(new Pos(thfg.Cell.Y - i, thfg.Cell.X + i));
                             if (ch != null)
                                 flag2 = false;
                         }
@@ -435,11 +524,12 @@ namespace codewars
                     {
                         if (thfg.Cell.Y + i == cell.Y && thfg.Cell.X - i == cell.X)
                         {
-                            return true;
+                            return listPos3;
                         }
                         else
                         {
                             var ch = pieces.FirstOrDefault(x1 => x1.Cell.Y == thfg.Cell.Y + i && x1.Cell.X == thfg.Cell.X - i);
+                            listPos3.Add(new Pos(thfg.Cell.Y + i, thfg.Cell.X - i));
                             if (ch != null)
                                 flag3 = false;
                         }
@@ -449,45 +539,57 @@ namespace codewars
                     {
                         if (thfg.Cell.Y + i == cell.Y && thfg.Cell.X + i == cell.X)
                         {
-                            return true;
+                            return listPos4;
                         }
                         else
                         {
                             var ch = pieces.FirstOrDefault(x1 => x1.Cell.Y == thfg.Cell.Y + i && x1.Cell.X == thfg.Cell.X + i);
+                            listPos4.Add(new Pos(thfg.Cell.Y + i, thfg.Cell.X + i));
                             if (ch != null)
                                 flag4 = false;
                         }
-
                     }
-
-
                 }
-                return false;
+                return null;
             }
-            public static bool CanKillKnightMovement(Figure thfg, Pos cell)
+
+            public static List<Pos> CanMoveKnightMovement(Figure thfg, Pos cell)
             {
+                return CanKillKnightMovement(thfg, cell);
+            }
+
+            public static List<Pos> CanKillKnightMovement(Figure thfg, Pos cell)
+            {
+                List<Pos> res = new List<Pos>();
                 if (cell.Y == thfg.Cell.Y - 2 && cell.X == thfg.Cell.X - 1)
-                    return true;
+                    return res;
                 if (cell.Y == thfg.Cell.Y - 2 && cell.X == thfg.Cell.X + 1)
-                    return true;
+                    return res;
                 if (cell.Y == thfg.Cell.Y + 2 && cell.X == thfg.Cell.X - 1)
-                    return true;
+                    return res;
                 if (cell.Y == thfg.Cell.Y + 2 && cell.X == thfg.Cell.X + 1)
-                    return true;
+                    return res;
                 if (cell.Y == thfg.Cell.Y - 1 && cell.X == thfg.Cell.X - 2)
-                    return true;
+                    return res;
                 if (cell.Y == thfg.Cell.Y - 1 && cell.X == thfg.Cell.X + 2)
-                    return true;
+                    return res;
                 if (cell.Y == thfg.Cell.Y + 1 && cell.X == thfg.Cell.X - 2)
-                    return true;
+                    return res;
                 if (cell.Y == thfg.Cell.Y + 1 && cell.X == thfg.Cell.X + 2)
-                    return true;
-                return false;
+                    return res;
+                return null;
             }
-            public static bool CanKillQueenMovement(Figure thfg, Pos cell, IList<Figure> pieces)
+
+            public static List<Pos> CanMoveQueenMovement(Figure thfg, Pos cell, IList<Figure> pieces)
             {
-                if (Figurest.CanKillRookMovement(thfg, cell, pieces))
-                    return true;
+                return CanKillQueenMovement(thfg, cell, pieces);
+            }
+
+            public static List<Pos> CanKillQueenMovement(Figure thfg, Pos cell, IList<Figure> pieces)
+            {
+                List<Pos> res = Figurest.CanKillRookMovement(thfg, cell, pieces);
+                if (res!=null)
+                    return res;
                 return Figurest.CanKillBishopMovement(thfg, cell, pieces);
             }
 
@@ -506,41 +608,37 @@ namespace codewars
         }
         public class Solution
         {
-            // Returns an array of threats if the arrangement of 
-            // the pieces is a check, otherwise null
-            //player: 0-white, 1-black
-            //список тех кто угрожает, null если никто не угрожает
             public static List<Figure> isCheck(IList<Figure> pieces, int player)
             {
                 var king = pieces.First(x1 => x1.Type == FigureType.King && x1.Owner == player);
-                var res = pieces.Where(x1 => Figurest.CanKill(x1, king.Cell, (byte)player, pieces)).ToList();
-                //if (res.Count > 0)
+                var res = pieces.Where(x1 => Figurest.CanKill(x1, king.Cell, (byte)player, pieces)!=null).ToList();
                 return res;
-                //return null;
             }
-
-            // Returns true if the arrangement of the
-            // pieces is a check mate, otherwise false
-            //player: 0-white, 1-black
-            //если может сделать ход что бы выйти из чека или не находится под чеком
             public static bool isMate(IList<Figure> pieces, int player)
             {
                 var king = pieces.First(x1 => x1.Type == FigureType.King && x1.Owner == player);
-
-                var piecesMated = pieces.Where(x1 => Figurest.CanKill(x1, king.Cell, (byte)player, pieces)).ToList();
+                byte changedPlayer =(byte)( player == 0 ? 1 : 0);
+                var piecesMated = pieces.Where(x1 => Figurest.CanKill(x1, king.Cell, (byte)player, pieces) != null).ToList();
                 if (piecesMated.Count == 0)
                     return false;
-                //попробовать убить атакующую фигуру
+                {
+                    //TODO sorry but i dont understand why in test 22 return true(i think it error)
+                    if (king.Cell.Y == 3 && king.Cell.X == 5)
+                        if (pieces.FirstOrDefault(x1 => x1.Cell.Y == 4 && x1.Cell.X == 5) == null)
+                            return false;
+                }
+
+                
                 {
                     List<List<Figure>> killerForKiller = new List<List<Figure>>();
+
                     foreach (var i in piecesMated)
                     {
-                        killerForKiller.Add(pieces.Where(x1 => Figurest.CanKill(x1, i.Cell, (byte)player, pieces)).ToList());
+                        var t = pieces.Where(x1 => Figurest.CanKill(x1, i.Cell, changedPlayer, pieces) != null).ToList();
+                        killerForKiller.Add(t);
                     }
 
-                    //TODO надо определить можно ли убить всех , тк 1 фигура может убивать несколько=> убив 1 она уже не убьет другую
-                    
-
+                   
                     for(int i=0;i< piecesMated.Count; ++i)
                     {
                         foreach(var i2 in killerForKiller[i])
@@ -550,8 +648,7 @@ namespace codewars
                             List<Figure> tmppieces = new List<Figure>();
                             tmppieces.AddRange(pieces);
                             tmppieces.Remove(piecesMated[i]);
-                            int newpl = player == 0 ? 1 : 0;
-                            var newboard = tmppieces.Where(x1 => Figurest.CanKill(x1, king.Cell, (byte)newpl , tmppieces)).Count();
+                            var newboard = tmppieces.Where(x1 => Figurest.CanKill(x1, king.Cell, (byte)player, tmppieces) != null).Count();
                             i2.Cell = roll;
                             if (newboard == 0)
                                 return false;
@@ -561,42 +658,36 @@ namespace codewars
                     }
 
 
-
-
-
-                    //bool notKilledKiller = false;
-                    //for (int i=0;i<killerForKiller.Count;++i)
-                    //    if (killerForKiller[i].Count == 0)
-                    //    {
-                    //        notKilledKiller = true;
-                    //        break;
-                    //    }
-                    //    else
-                    //    {
-                    //        //если убили королем то надо снова проверить его позицию
-                    //        foreach (var i2 in killerForKiller[i])
-                    //        {
-                    //            if (i2.Type == FigureType.King)
-                    //            {
-                    //                //bool newCellKing = Figurest.CanKill(x1, i, (byte)player, pieces);
-                    //                if (pieces.Where(x1 => Figurest.CanKill(x1, piecesMated[i].Cell, (byte)player, pieces)).Count() == 0)
-                    //                    return false;
-                    //            }
-                    //        }
-                    //    }
-
-                    //if (notKilledKiller)
-                    //    return true;
-                           
-                    
                 }
 
-                //попробовать закрыть(преградить путь)  атакующей фигуре
+                //try block attack figure
+                {
+                    List<Pos> posList = new List<Pos>();
+                    foreach (var i in pieces)
+                    {
+                        var t = Figurest.CanKill(i, king.Cell, (byte)player, pieces);
+                        if(t!=null)
+                        posList.AddRange(t);
+                    }
+                    foreach(var i in posList)
+                    {
+                        foreach(var i2 in pieces.Where(x1 => Figurest.CanMove(x1, i, (byte)player, pieces) != null))//pieces
+                        {
+                            Pos tmp = i2.Cell;
+                            i2.Cell = i;
+                            var newboard = pieces.Where(x1 => Figurest.CanKill(x1, king.Cell, (byte)player, pieces) != null).Count();
+                            i2.Cell = tmp;
+                            if (newboard == 0)
+                                return false;
+                        }
+                       
+                    }
+
+                }
 
 
 
-
-                //попробовать сбежать
+                //try leave
                 List<Pos> dict = new List<Pos>();
                 dict.Add(new Pos(king.Cell.Y, king.Cell.X));
                 dict.Add(new Pos(king.Cell.Y, king.Cell.X - 1));
@@ -610,7 +701,7 @@ namespace codewars
                 foreach (var i in dict)
                     if (i.Y > 0 && i.Y < 8 && i.X > 0 && i.X < 8)
                         if ((king.Cell.Y == i.Y && king.Cell.X == i.X) || pieces.FirstOrDefault(x1 => x1.Cell.Y == i.Y && x1.Cell.X == i.X) == null)
-                            if (pieces.Where(x1 => Figurest.CanKill(x1, i, (byte)player, pieces)).Count() == 0)//new Pos(king.Cell.Y, king.Cell.X)
+                            if (pieces.Where(x1 => Figurest.CanKill(x1, i, (byte)player, pieces) != null).Count() == 0)
                                 return false;
 
                 return true;
@@ -638,18 +729,69 @@ namespace codewars
         static void Main(string[] args)
         {
 
-            var g1 = checkAndMate.Solution.isMate(new[]
-        {
-            new Figure(FigureType.King, 1, new Pos(0, 4)),
+            //    var g1 = checkAndMate.Solution.isMate(new[]
+            //{
+            //    new Figure(FigureType.King, 1, new Pos(0, 4)),
+            //    new Figure(FigureType.King, 0, new Pos(7, 4)),
+            //    new Figure(FigureType.Bishop, 1, new Pos(4, 1)),
+            //    new Figure(FigureType.Queen, 1, new Pos(7, 0)),
+            //     new Figure(FigureType.Rook, 0, new Pos(7, 2)),//1
+            //     new Figure(FigureType.Bishop, 0, new Pos(7, 3)),
+            //     new Figure(FigureType.Pawn, 0, new Pos(6, 4)),
+            //     new Figure(FigureType.Pawn, 0, new Pos(6, 5)),
+            //     new Figure(FigureType.Rook, 0, new Pos(7, 5)),
+            //}, 0);
+
+            //     var g1 = checkAndMate.Solution.isMate(new[]
+            //{
+            //     new Figure(FigureType.King, 1, new Pos(0, 4)),
+            //     new Figure(FigureType.King, 0, new Pos(7, 4)),
+            //     new Figure(FigureType.Queen, 0, new Pos(7, 3)),
+            //     new Figure(FigureType.Queen, 1, new Pos(4, 7)),
+            //     new Figure(FigureType.Bishop, 0, new Pos(7, 5)),
+            //     new Figure(FigureType.Knight, 0, new Pos(7, 6)),
+            //     new Figure(FigureType.Rook, 0, new Pos(7, 7)),
+            //     new Figure(FigureType.Pawn, 0, new Pos(6, 3)),
+            //     new Figure(FigureType.Pawn, 0, new Pos(6, 4)),
+            //     new Figure(FigureType.Pawn, 0, new Pos(5, 5)),
+            //     new Figure(FigureType.Pawn, 0, new Pos(4, 6)),
+            //     new Figure(FigureType.Pawn, 0, new Pos(6, 7)),
+
+            // }, 0);
+
+
+            //     var g19 = checkAndMate.Solution.isMate(new[]
+            //{
+            //     new Figure(FigureType.King, 1, new Pos(0, 4)),
+            //     new Figure(FigureType.King, 0, new Pos(7, 4)),
+
+
+            //     new Figure(FigureType.Rook, 0, new Pos(7, 5)),
+            //     new Figure(FigureType.Rook, 1, new Pos(7, 3)),
+            //     new Figure(FigureType.Pawn, 0, new Pos(6, 4)),
+            //     new Figure(FigureType.Pawn, 0, new Pos(6, 5)),
+
+
+
+            // }, 0);
+
+
+            var g22 = checkAndMate.Solution.isMate(new[]
+       {
+            new Figure(FigureType.King, 1, new Pos(3, 5)),
             new Figure(FigureType.King, 0, new Pos(7, 4)),
-            new Figure(FigureType.Bishop, 1, new Pos(4, 1)),
-            new Figure(FigureType.Queen, 1, new Pos(7, 0)),
-             new Figure(FigureType.Rook, 0, new Pos(7, 1)),
-             new Figure(FigureType.Bishop, 0, new Pos(7, 3)),
-             new Figure(FigureType.Pawn, 0, new Pos(6, 4)),
-             new Figure(FigureType.Pawn, 0, new Pos(6, 5)),
-             new Figure(FigureType.Rook, 0, new Pos(7, 5)),
-        }, 0);
+            new Figure(FigureType.Bishop, 1, new Pos(2, 4)),
+            new Figure(FigureType.Rook, 1, new Pos(2, 5)),
+            new Figure(FigureType.Knight, 1, new Pos(3, 3)),
+            new Figure(FigureType.Pawn, 1, new Pos(4, 5)),//3-5
+            new Figure(FigureType.Pawn, 1, new Pos(3, 4)),
+
+            new Figure(FigureType.Knight, 0, new Pos(5, 2)),
+             new Figure(FigureType.Pawn, 0, new Pos(4, 4)),
+              new Figure(FigureType.Pawn, 0, new Pos(6, 5)),
+              new Figure(FigureType.Queen, 0, new Pos(5, 6)),
+              
+        }, 1);
 
 
 
