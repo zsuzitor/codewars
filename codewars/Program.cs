@@ -1,4 +1,4 @@
-﻿using codewars.checkAndMate;
+﻿//using codewars.checkAndMate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -711,8 +711,397 @@ namespace codewars
 
 
 
+    //Skyscrapers.Skyscrapers.SolvePuzzle
+    namespace Skyscrapers
+    {
+        //4 By 4 Skyscrapers
+        //https://www.codewars.com/kata/5671d975d81d6c1c87000022/train/csharp
+
+        // Start your coding here...
+        //4 - 1234
+        //3 - 2134 2314 2341 1324 1342 1243 
+        //2 - 1432 1423 2431 2413 3421 3412 2143 3142 3241
+        //1 - 4123 4132 4213 4231 4321 4312
+        //идти по часовой стрелке и проставлять ячейки в которых уверен на 100% 
+        //те в которых не уверен закидывать в них список возможных
+        //когда каждая ячейка просмотривается с новой стороны, надо сравнивать
+        //и находить число которое есть в обеих коллекциях
 
 
+        public static class Skyscrapers_
+        {
+            public static int[][] SolvePuzzle(int[] clues)
+            {
+                Item[][] matrix = new Item[4][];
+                for (int i = 0; i < 4; ++i)
+                {
+                    matrix[i] = new Item[4] { new Item(), new Item(), new Item(), new Item() };
+                }
+               
+                //num число-подсказка для массива mass ,initial- надо ли добавлять новые
+                Action<IList<Item>, int> initTriangle = (IList<Item > mass, int num) =>//, bool initial
+                {
+                    List<List<int>> newlist = new List<List<int>>() { new List<int>(), new List<int>(), new List<int>(), new List<int>() };
+                    foreach (var i2 in GetRules(num))
+                    {
+                        //foreach(var i in i2)//for(int i = 0; i < 4; ++i)
+                        for (int i = 0; i < i2.Length; ++i)
+                        {
+                            int tmp = (int)char.GetNumericValue(i2[i]);//i2[i]
+                            newlist[i].Add( tmp);
+                            
+                        }
+                      
+                    }
+
+                    for(var i=0;i<newlist.Count;++i)
+                    {
+                     if(newlist[i].Count>0)  
+                            mass[i].Can.RemoveAll(x1=>newlist[i].FirstOrDefault(x2=>x2==x1)==0);
+                        
+
+                    }
+                    //int g = 10;
+
+                    };
+
+                //initTriangle(new List<Item>() { new Item() { Can=new List<int>() { 4} }, new Item() { Can = new List<int>() { 4 } }, new Item() { Can = new List<int>() { 4 } }, new Item() { Can = new List<int>() { 4 } } },2);
+
+
+                for (int i = 0; i < 4; ++i)//clues.Length
+                {
+                    //вертикаль
+                    List<Item> tmpline = new List<Item>();
+                    List<Item> tmpvert = new List<Item>();
+                    for (int i2 = 0; i2 < 4; ++i2)//clues.Length
+                    {
+                        tmpline.Add(matrix[i][i2]);
+                        tmpvert.Add(matrix[i2][i]);
+                    }
+                    initTriangle(tmpvert, clues[i]);
+                    tmpvert.Reverse();
+                    initTriangle(tmpvert, clues[15-4-i]);
+                    initTriangle(tmpline, clues[15 - i]);
+                    tmpline.Reverse();
+                    initTriangle(tmpline, clues[i+4]);
+                    
+                    
+
+                    //initTriangle(i, false);
+                    //initTriangle(i + 7, true);
+                }
+            
+                do
+                {
+                    do
+                    {
+                        do
+                        {
+                            do
+                            {
+                                if (CheckMatrix(matrix))
+                                    return SetIntMatr(matrix);
+                            }
+                            while (SetNextSum4(matrix[0]));
+                        }
+                        while (SetNextSum4(matrix[1]));
+                    }
+                    while (SetNextSum4(matrix[2]));
+                }
+                while (SetNextSum4(matrix[3]));
+
+                //---------------------
+
+
+
+                return SetIntMatr(matrix);
+            }
+
+            //public static initTriangle(int i,bool addnew)
+            //{
+
+            //}
+            public static int[][] SetIntMatr(Item[][] matrix)
+            {
+
+                int[][] intmatr = new int[4][];
+                for (int i = 0; i < 4; ++i)
+                {
+                    intmatr[i] = new int[4];
+                    for (int i2 = 0; i2 < 4; ++i2)
+                    {
+                        intmatr[i][i2] = matrix[i][i2].Can[matrix[i][i2].CurrentIndex];
+                    }
+
+                }
+                return intmatr;
+            }
+
+
+            public static bool CheckMatrix(Item[][] matrix)
+            {
+                var res = true;
+                for (int i = 0; i < 4; ++i)
+                {
+                    int summLine = 0;
+                    int summVert = 0;
+                    for (int i2 = 0; i2 < 4; ++i2)
+                    {
+                        summLine+=matrix[i][i2].Can[matrix[i][i2].CurrentIndex];
+                        summVert +=  matrix[i2][i].Can[matrix[i2][i].CurrentIndex];
+                    }
+                    if (summLine != 10 || summVert != 10)
+                    {
+                        res = false;
+                        break;
+                    }
+                }
+               
+                return res;
+            }
+
+            public static bool SetNextSum4(IList<Item> items)
+            {
+                
+               // bool Goto = false;
+               
+
+                items[3].CurrentIndex++;
+                do
+                {
+                    do
+                    {
+                        do
+                        {
+                            while (items[3].CurrentIndex < items[3].Can.Count)  //do
+                            {
+                                int[] line = new int[4];
+                                line[0] = items[0].Can[items[0].CurrentIndex];
+                                line[1] = items[1].Can[items[1].CurrentIndex];
+                                line[2] = items[2].Can[items[2].CurrentIndex];
+                                line[3] = items[3].Can[items[3].CurrentIndex];
+
+                                //int sumLine = items[0].Can[items[0].CurrentIndex] + items[1].Can[items[1].CurrentIndex] +
+                                //    items[2].Can[items[2].CurrentIndex] + items[3].Can[items[3].CurrentIndex];
+                                if (line.Sum() == 10&&line.Distinct().Count()==line.Length)
+                                {
+                                    //Goto = true;
+                                    goto gt;
+                                }
+                                items[3].CurrentIndex ++;
+                            }
+                           
+                            items[3].CurrentIndex = 0;
+                            items[2].CurrentIndex++;
+                        }
+                        while (items[2].CurrentIndex < items[2].Can.Count);
+                        items[2].CurrentIndex = 0;
+                        items[1].CurrentIndex++;
+                    }
+                    while (items[1].CurrentIndex < items[1].Can.Count);
+                    items[1].CurrentIndex = 0;
+                    items[0].CurrentIndex++;
+                }
+                while (items[0].CurrentIndex < items[0].Can.Count);
+
+
+                //if (!Goto)
+                //{
+                    foreach (var i in items)
+                        i.CurrentIndex = 0;
+                    return false;
+               // }
+
+
+                gt:
+                return true;
+
+
+            }
+
+
+
+
+            public static List<string> GetRules(int num)
+            {
+                switch (num)
+                {
+                    case 1:
+                        return new List<string>() { "4123", "4132", "4213", "4231", "4321", "4312" };
+                    case 2:
+                        return new List<string>() { "1432", "1423", "2431", "2413", "3421", "3412", "2143", "3142", "3241","3124","3214" };
+                    case 3:
+                        return new List<string>() { "2134", "2314", "2341", "1324", "1342", "1243" };
+                    case 4:
+                        return new List<string>() { "1234" };
+                    default:
+                        return new List<string>() { "" };
+                }
+                //return new List<string>();
+            }
+
+
+        }
+
+        public class Item
+        {
+            //public int Val{ get; set; }
+            public List<int> Can { get; set; }
+            public int CurrentIndex { get; set; }
+
+            public Item()
+            {
+                 CurrentIndex = 0;
+                Can = new List<int>() {1,2,3,4 };
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public static class Skyscrapers
+        {
+            public static int[][] SolvePuzzle(int[] clues)
+            {
+                Item[][] matrix = new Item[4][];
+                for (int i = 0; i < 4; ++i)
+                {
+                    matrix[i] = new Item[4] { new Item(), new Item(), new Item(), new Item() };
+                }
+
+                List<List<string>> main = new List<List<string>>();
+
+                for (int i = 0; i < 4; ++i)
+                {
+                    
+                    var left=GetRules(clues[15 - i]);
+                    var right = GetRules(clues[i + 4]);
+
+                    //найти общие строки для 1 горизонтали между left и right
+                    main.Add(общие строки);
+                }
+                //просто перебирать main пока не будет удовлетворения с колонками и  сумма матрицы норм 
+
+                do
+                {
+                    do
+                    {
+                        do
+                        {
+                            do
+                            {
+                                if (CheckMatrix(matrix))
+                                    return SetIntMatr(matrix);
+                            }
+                            while (SetNextSum4(matrix[0]));
+                        }
+                        while (SetNextSum4(matrix[1]));
+                    }
+                    while (SetNextSum4(matrix[2]));
+                }
+                while (SetNextSum4(matrix[3]));
+
+
+                //---------------------
+
+
+
+                return SetIntMatr(matrix);
+            }
+
+            //public static initTriangle(int i,bool addnew)
+            //{
+
+            //}
+            public static int[][] SetIntMatr(Item[][] matrix)
+            {
+
+                int[][] intmatr = new int[4][];
+                for (int i = 0; i < 4; ++i)
+                {
+                    intmatr[i] = new int[4];
+                    for (int i2 = 0; i2 < 4; ++i2)
+                    {
+                        intmatr[i][i2] = matrix[i][i2].Can[matrix[i][i2].CurrentIndex];
+                    }
+
+                }
+                return intmatr;
+            }
+
+
+            public static bool CheckMatrix(Item[][] matrix)
+            {
+                var res = true;
+                for (int i = 0; i < 4; ++i)
+                {
+                    int summLine = 0;
+                    int summVert = 0;
+                    for (int i2 = 0; i2 < 4; ++i2)
+                    {
+                        summLine += matrix[i][i2].Can[matrix[i][i2].CurrentIndex];
+                        summVert += matrix[i2][i].Can[matrix[i2][i].CurrentIndex];
+                    }
+                    if (summLine != 10 || summVert != 10)
+                    {
+                        res = false;
+                        break;
+                    }
+                }
+
+                return res;
+            }
+
+           
+
+
+
+            public static List<string> GetRules(int num)
+            {
+                switch (num)
+                {
+                    case 1:
+                        return new List<string>() { "4123", "4132", "4213", "4231", "4321", "4312" };
+                    case 2:
+                        return new List<string>() { "1432", "1423", "2431", "2413", "3421", "3412", "2143", "3142", "3241", "3124", "3214" };
+                    case 3:
+                        return new List<string>() { "2134", "2314", "2341", "1324", "1342", "1243" };
+                    case 4:
+                        return new List<string>() { "1234" };
+                    default:
+                        return new List<string>() { "1234","1243", "1324", "1342", "1432", "1423", "2134", "2143", "2314", "2341", "2413", "2431", "3124", "3142", "3214", "3241", "3412", "3421", "4123", "4132", "4213", "4231", "4312", "4321" };
+                }
+                //return new List<string>();
+            }
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
 
 
 
@@ -729,72 +1118,20 @@ namespace codewars
         static void Main(string[] args)
         {
 
-            //    var g1 = checkAndMate.Solution.isMate(new[]
-            //{
-            //    new Figure(FigureType.King, 1, new Pos(0, 4)),
-            //    new Figure(FigureType.King, 0, new Pos(7, 4)),
-            //    new Figure(FigureType.Bishop, 1, new Pos(4, 1)),
-            //    new Figure(FigureType.Queen, 1, new Pos(7, 0)),
-            //     new Figure(FigureType.Rook, 0, new Pos(7, 2)),//1
-            //     new Figure(FigureType.Bishop, 0, new Pos(7, 3)),
-            //     new Figure(FigureType.Pawn, 0, new Pos(6, 4)),
-            //     new Figure(FigureType.Pawn, 0, new Pos(6, 5)),
-            //     new Figure(FigureType.Rook, 0, new Pos(7, 5)),
-            //}, 0);
+            //сначала получить все возможные варианты для строк, потом уже по этим спискам искать
 
-            //     var g1 = checkAndMate.Solution.isMate(new[]
-            //{
-            //     new Figure(FigureType.King, 1, new Pos(0, 4)),
-            //     new Figure(FigureType.King, 0, new Pos(7, 4)),
-            //     new Figure(FigureType.Queen, 0, new Pos(7, 3)),
-            //     new Figure(FigureType.Queen, 1, new Pos(4, 7)),
-            //     new Figure(FigureType.Bishop, 0, new Pos(7, 5)),
-            //     new Figure(FigureType.Knight, 0, new Pos(7, 6)),
-            //     new Figure(FigureType.Rook, 0, new Pos(7, 7)),
-            //     new Figure(FigureType.Pawn, 0, new Pos(6, 3)),
-            //     new Figure(FigureType.Pawn, 0, new Pos(6, 4)),
-            //     new Figure(FigureType.Pawn, 0, new Pos(5, 5)),
-            //     new Figure(FigureType.Pawn, 0, new Pos(4, 6)),
-            //     new Figure(FigureType.Pawn, 0, new Pos(6, 7)),
-
-            // }, 0);
-
-
-            //     var g19 = checkAndMate.Solution.isMate(new[]
-            //{
-            //     new Figure(FigureType.King, 1, new Pos(0, 4)),
-            //     new Figure(FigureType.King, 0, new Pos(7, 4)),
-
-
-            //     new Figure(FigureType.Rook, 0, new Pos(7, 5)),
-            //     new Figure(FigureType.Rook, 1, new Pos(7, 3)),
-            //     new Figure(FigureType.Pawn, 0, new Pos(6, 4)),
-            //     new Figure(FigureType.Pawn, 0, new Pos(6, 5)),
+            var res = Skyscrapers.Skyscrapers.SolvePuzzle(new[]{ 2, 2, 1, 3,
+                           2, 2, 3, 1,
+                           1, 2, 2, 3,
+                           3, 2, 1, 3});
+            //var res = Skyscrapers.Skyscrapers.SolvePuzzle(new[]{ 0, 0, 1, 2,
+            //               0, 2, 0, 0,
+            //               0, 3, 0, 0,
+            //               0, 1, 0, 0});
 
 
 
-            // }, 0);
-
-
-            var g22 = checkAndMate.Solution.isMate(new[]
-       {
-            new Figure(FigureType.King, 1, new Pos(3, 5)),
-            new Figure(FigureType.King, 0, new Pos(7, 4)),
-            new Figure(FigureType.Bishop, 1, new Pos(2, 4)),
-            new Figure(FigureType.Rook, 1, new Pos(2, 5)),
-            new Figure(FigureType.Knight, 1, new Pos(3, 3)),
-            new Figure(FigureType.Pawn, 1, new Pos(4, 5)),//3-5
-            new Figure(FigureType.Pawn, 1, new Pos(3, 4)),
-
-            new Figure(FigureType.Knight, 0, new Pos(5, 2)),
-             new Figure(FigureType.Pawn, 0, new Pos(4, 4)),
-              new Figure(FigureType.Pawn, 0, new Pos(6, 5)),
-              new Figure(FigureType.Queen, 0, new Pos(5, 6)),
-              
-        }, 1);
-
-
-
+            Console.ReadKey();
         }
 
 
