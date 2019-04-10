@@ -972,10 +972,10 @@ namespace codewars
         {
             public static int[][] SolvePuzzle(int[] clues)
             {
-                Item[][] matrix = new Item[4][];
+                int[][] matrix = new int[4][];
                 for (int i = 0; i < 4; ++i)
                 {
-                    matrix[i] = new Item[4] { new Item(), new Item(), new Item(), new Item() };
+                    matrix[i] = new int[4] { 0, 0, 0, 0 };
                 }
 
                 List<List<string>> main = new List<List<string>>();
@@ -985,80 +985,77 @@ namespace codewars
                     
                     var left=GetRules(clues[15 - i]);
                     var right = GetRules(clues[i + 4]);
-
+                    for (int i2 = 0; i2 < right.Count; ++i2)
+                        right[i2] = string.Join("",right[i2].Reverse().ToArray());
                     //найти общие строки для 1 горизонтали между left и right
-                    main.Add(общие строки);
+                    main.Add(left.Where(x1=>right.FirstOrDefault(x2=>x2== x1) !=null).ToList());
                 }
                 //просто перебирать main пока не будет удовлетворения с колонками и  сумма матрицы норм 
-
-                do
+                
+                for (int index0row = 0; index0row < main[0].Count; ++index0row)
                 {
-                    do
+                    SetNext(matrix, main, 0, index0row);
+                    for (int index1row = 0; index1row < main[1].Count;++index1row)
                     {
-                        do
+                        SetNext(matrix, main, 1, index1row);
+                        for (int index2row = 0; index2row < main[2].Count;++index2row)
                         {
-                            do
+                            SetNext(matrix, main, 2, index2row);
+                            for (int index3row = 0; index3row < main[3].Count;++index3row)
                             {
-                                if (CheckMatrix(matrix))
-                                    return SetIntMatr(matrix);
+                                SetNext(matrix, main, 3, index3row);
+                                if (CheckMatrix(matrix,clues))
+                                   return matrix;
                             }
-                            while (SetNextSum4(matrix[0]));
                         }
-                        while (SetNextSum4(matrix[1]));
                     }
-                    while (SetNextSum4(matrix[2]));
+                    
                 }
-                while (SetNextSum4(matrix[3]));
 
-
-                //---------------------
-
-
-
-                return SetIntMatr(matrix);
-            }
-
-            //public static initTriangle(int i,bool addnew)
-            //{
-
-            //}
-            public static int[][] SetIntMatr(Item[][] matrix)
-            {
-
-                int[][] intmatr = new int[4][];
-                for (int i = 0; i < 4; ++i)
-                {
-                    intmatr[i] = new int[4];
-                    for (int i2 = 0; i2 < 4; ++i2)
-                    {
-                        intmatr[i][i2] = matrix[i][i2].Can[matrix[i][i2].CurrentIndex];
-                    }
-
-                }
-                return intmatr;
+                return matrix;
             }
 
 
-            public static bool CheckMatrix(Item[][] matrix)
+            //row - текущая строка(вариант для строки матрицы) которую рассматриваем
+            public static void SetNext(int[][] matrix, List<List<string>> mainLinesHoriz, int row, int variant)
             {
-                var res = true;
+
                 for (int i = 0; i < 4; ++i)
                 {
-                    int summLine = 0;
-                    int summVert = 0;
-                    for (int i2 = 0; i2 < 4; ++i2)
-                    {
-                        summLine += matrix[i][i2].Can[matrix[i][i2].CurrentIndex];
-                        summVert += matrix[i2][i].Can[matrix[i2][i].CurrentIndex];
-                    }
-                    if (summLine != 10 || summVert != 10)
-                    {
-                        res = false;
-                        break;
-                    }
+                   
+                        matrix[row][i] = (int)char.GetNumericValue(mainLinesHoriz[row][variant][i]);
+                    
                 }
 
-                return res;
+            }
+
+
+            public static bool CheckMatrix(int[][] matrix,int[] clues)
+            {
+                List<List<string>> main = new List<List<string>>();
+
+                for (int i = 0; i < 4; ++i)
+                {
+
+                    var top = GetRules(clues[i]);
+                    var bot = GetRules(clues[15 - 4 - i]);
+                    for(int i2=0;i2< bot.Count; ++i2)
+                        bot[i2] = string.Join("", bot[i2].Reverse().ToArray());
+                    main.Add(top.Where(x1 => bot.FirstOrDefault(x2 => x2 == x1) != null).ToList());
+                    string strcol = "";
+                    int sumcol = 0;
+                    for (int i2 = 0; i2 < 4; ++i2)
+                    {
+                        strcol += matrix[i2][i];
+                        sumcol += matrix[i2][i];
+                    }
+                    if (!main[i].Contains(strcol))
+                        return false;
+                    if (sumcol != 10)
+                        return false;
+                }
+               
+                return true;
             }
 
            
@@ -1080,10 +1077,7 @@ namespace codewars
                     default:
                         return new List<string>() { "1234","1243", "1324", "1342", "1432", "1423", "2134", "2143", "2314", "2341", "2413", "2431", "3124", "3142", "3214", "3241", "3412", "3421", "4123", "4132", "4213", "4231", "4312", "4321" };
                 }
-                //return new List<string>();
             }
-
-
         }
 
 
@@ -1120,14 +1114,14 @@ namespace codewars
 
             //сначала получить все возможные варианты для строк, потом уже по этим спискам искать
 
-            var res = Skyscrapers.Skyscrapers.SolvePuzzle(new[]{ 2, 2, 1, 3,
-                           2, 2, 3, 1,
-                           1, 2, 2, 3,
-                           3, 2, 1, 3});
-            //var res = Skyscrapers.Skyscrapers.SolvePuzzle(new[]{ 0, 0, 1, 2,
-            //               0, 2, 0, 0,
-            //               0, 3, 0, 0,
-            //               0, 1, 0, 0});
+            //var res = Skyscrapers.Skyscrapers.SolvePuzzle(new[]{ 2, 2, 1, 3,
+            //               2, 2, 3, 1,
+            //               1, 2, 2, 3,
+            //               3, 2, 1, 3});
+            var res = Skyscrapers.Skyscrapers.SolvePuzzle(new[]{ 0, 0, 1, 2,
+                           0, 2, 0, 0,
+                           0, 3, 0, 0,
+                           0, 1, 0, 0});
 
 
 
